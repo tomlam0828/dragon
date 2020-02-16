@@ -30,7 +30,6 @@ class Generation extends Component {
     }
 
     render() {
-        console.log('this.props', this.props);
         const { generation } = this.props;
         if (generation.status === fetchStates.fetching) {
             return <div>...</div>;

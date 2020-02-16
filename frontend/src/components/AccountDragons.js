@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchAccountDragons } from '../actions/accountDragons';
 import AccountDragonRow from './AccountDragonRow';
+import { Link } from 'react-router-dom';
 
 class AccountDragons extends Component {
     componentDidMount() {
@@ -22,6 +23,7 @@ class AccountDragons extends Component {
                         )
                     })
                 }
+                <Link to='/'>Back To Home</Link>
             </div>
         );
     }
