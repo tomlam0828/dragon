@@ -1,12 +1,12 @@
 const { Router } = require('express');
-const AccountTable = require('../acccount/table');
-const { hash } = require('../acccount/helper');
+const AccountTable = require('../account/table');
 const AccountDragonTable = require('../accountDragon/table');
+const Session = require('../account/session');
+const { hash } = require('../account/helper');
 const { setSession, authenticatedAccount } = require('./helper');
-const Session = require('../acccount/session');
 const { getDragonWithTraits } = require('../dragon/helper');
 
-const router = Router();
+const router = new Router();
 
 router.post('/signup', (req, res, next) => {
     const { username, password } = req.body;
@@ -18,18 +18,18 @@ router.post('/signup', (req, res, next) => {
             if (!account) {
                 return AccountTable.storeAccount({ usernameHash, passwordHash })
             } else {
-                const err = new Error('This username has already been taken');
+                const error = new Error('This username has already been taken');
 
-                err.statusCode = 409;
+                error.statusCode = 409;
 
-                throw err;
+                throw error;
             }
         })
         .then(() => {
-            return setSession({ username, res })
+            return setSession({ username, res });
         })
         .then(({ message }) => res.json({ message }))
-        .catch(err => next(err));
+        .catch(error => next(error));
 });
 
 router.post('/login', (req, res, next) => {
@@ -38,15 +38,15 @@ router.post('/login', (req, res, next) => {
     AccountTable.getAccount({ usernameHash: hash(username) })
         .then(({ account }) => {
             if (account && account.passwordHash === hash(password)) {
-                const { sessionId } = account
+                const { sessionId } = account;
 
                 return setSession({ username, res, sessionId })
             } else {
-                const err = new Error('Incorrect username/password');
+                const error = new Error('Incorrect username/password');
 
-                err.statusCode = 409;
+                error.statusCode = 409;
 
-                throw err
+                throw error;
             }
         })
         .then(({ message }) => res.json({ message }))
@@ -59,13 +59,11 @@ router.get('/logout', (req, res, next) => {
     AccountTable.updateSessionId({
         sessionId: null,
         usernameHash: hash(username)
-    })
-        .then(() => {
-            res.clearCookie('sessionString');
+    }).then(() => {
+        res.clearCookie('sessionString');
 
-            res.json({ message: 'Successful logout' });
-        })
-        .catch(error => next(error));
+        res.json({ message: 'Successful logout' });
+    }).catch(error => next(error));
 });
 
 router.get('/authenticated', (req, res, next) => {
@@ -79,7 +77,7 @@ router.get('/dragons', (req, res, next) => {
         .then(({ account }) => {
             return AccountDragonTable.getAccountDragons({
                 accountId: account.id
-            })
+            });
         })
         .then(({ accountDragons }) => {
             return Promise.all(
@@ -91,20 +89,15 @@ router.get('/dragons', (req, res, next) => {
         .then(dragons => {
             res.json({ dragons });
         })
-        .catch(err => next(err));
+        .catch(error => next(error));
 });
 
 router.get('/info', (req, res, next) => {
     authenticatedAccount({ sessionString: req.cookies.sessionString })
         .then(({ account, username }) => {
-            res.json({
-                info: {
-                    balance: account.balance,
-                    username
-                }
-            })
+            res.json({ info: { balance: account.balance, username } });
         })
-        .catch(err => next(err));
-})
+        .catch(error => next(error));
+});
 
 module.exports = router;

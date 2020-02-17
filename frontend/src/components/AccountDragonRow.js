@@ -8,25 +8,28 @@ class AccountDragonRow extends Component {
         nickname: this.props.dragon.nickname,
         isPublic: this.props.dragon.isPublic,
         saleValue: this.props.dragon.saleValue,
+        sireValue: this.props.dragon.sireValue,
         edit: false
     };
 
     updateNickname = event => {
-        this.setState({
-            nickname: event.target.value
-        });
-    }
-
-    toggleEdit = () => {
-        this.setState({ edit: !this.state.edit });
+        this.setState({ nickname: event.target.value });
     }
 
     updateSaleValue = event => {
         this.setState({ saleValue: event.target.value });
     }
 
+    updateSireValue = event => {
+        this.setState({ sireValue: event.target.value });
+    }
+
     updateIsPublic = event => {
         this.setState({ isPublic: event.target.checked });
+    }
+
+    toggleEdit = () => {
+        this.setState({ edit: !this.state.edit });
     }
 
     save = () => {
@@ -37,9 +40,10 @@ class AccountDragonRow extends Component {
                 dragonId: this.props.dragon.dragonId,
                 nickname: this.state.nickname,
                 isPublic: this.state.isPublic,
-                saleValue: this.state.saleValue
+                saleValue: this.state.saleValue,
+                sireValue: this.state.sireValue
             })
-        }).then(res => res.json())
+        }).then(response => response.json())
             .then(json => {
                 if (json.type === 'error') {
                     alert(json.message);
@@ -47,15 +51,15 @@ class AccountDragonRow extends Component {
                     this.toggleEdit();
                 }
             })
-            .catch(err => alert(err.message));
+            .catch(error => alert(error.message));
     }
 
     get SaveButton() {
-        return <Button onClick={this.save}>Save</Button>
+        return <Button onClick={this.save}>Save</Button>;
     }
 
     get EditButton() {
-        return <Button onClick={this.toggleEdit}>Edit</Button>
+        return <Button onClick={this.toggleEdit}>Edit</Button>;
     }
 
     render() {
@@ -77,8 +81,19 @@ class AccountDragonRow extends Component {
                             disabled={!this.state.edit}
                             value={this.state.saleValue}
                             onChange={this.updateSaleValue}
+                            className='account-dragon-row-input'
                         />
-                    </span> {' '}
+                    </span>{' '}
+                    <span>
+                        Sire Value:{' '}
+                        <input
+                            type='number'
+                            disabled={!this.state.edit}
+                            value={this.state.sireValue}
+                            onChange={this.updateSireValue}
+                            className='account-dragon-row-input'
+                        />
+                    </span>{' '}
                     <span>
                         Public:{' '}
                         <input
@@ -88,7 +103,9 @@ class AccountDragonRow extends Component {
                             onChange={this.updateIsPublic}
                         />
                     </span>
-                    {this.state.edit ? this.SaveButton : this.EditButton}
+                    {
+                        this.state.edit ? this.SaveButton : this.EditButton
+                    }
                 </div>
             </div>
         )

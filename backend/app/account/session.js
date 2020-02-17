@@ -1,7 +1,7 @@
 const uuid = require('uuid/v4');
 const { hash } = require('./helper');
 
-const SEPERATOR = '|';
+const SEPARATOR = '|';
 
 class Session {
     constructor({ username }) {
@@ -16,7 +16,7 @@ class Session {
     }
 
     static parse(sessionString) {
-        const sessionData = sessionString.split(SEPERATOR);
+        const sessionData = sessionString.split(SEPARATOR);
 
         return {
             username: sessionData[0],
@@ -34,13 +34,13 @@ class Session {
     }
 
     static accountData({ username, id }) {
-        return `${username}${SEPERATOR}${id}`;
+        return `${username}${SEPARATOR}${id}`;
     }
 
     static sessionString({ username, id }) {
         const accountData = Session.accountData({ username, id });
 
-        return `${accountData}${SEPERATOR}${hash(accountData)}`;
+        return `${accountData}${SEPARATOR}${hash(accountData)}`;
     }
 }
 

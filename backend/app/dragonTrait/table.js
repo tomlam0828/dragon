@@ -7,15 +7,15 @@ class DragonTraitTable {
             TraitTable.getTraitId({ traitType, traitValue })
                 .then(({ traitId }) => {
                     pool.query(
-                        `INSERT INTO dragonTrait("traitId", "dragonId") VALUES($1, $2)`,
+                        'INSERT INTO dragonTrait("traitId", "dragonId") VALUES($1, $2)',
                         [traitId, dragonId],
-                        (err, res) => {
-                            if (err) return reject(err);
+                        (error, response) => {
+                            if (error) return reject(error);
 
                             resolve();
                         }
                     )
-                })
+                });
         });
     }
 }

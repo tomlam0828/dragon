@@ -1,6 +1,6 @@
-const Session = require('../acccount/session');
-const AccountTable = require('../acccount/table');
-const { hash } = require('../acccount/helper');
+const Session = require('../account/session');
+const AccountTable = require('../account/table');
+const { hash } = require('../account/helper');
 
 
 const setSession = ({ username, res, sessionId }) => {
@@ -9,7 +9,8 @@ const setSession = ({ username, res, sessionId }) => {
 
         if (sessionId) {
             sessionString = Session.sessionString({ username, id: sessionId });
-            setsessionCookie({ sessionString, res });
+
+            setSessionCookie({ sessionString, res });
 
             resolve({ message: 'session restored' });
         } else {
@@ -19,33 +20,33 @@ const setSession = ({ username, res, sessionId }) => {
             AccountTable.updateSessionId({
                 sessionId: session.id,
                 usernameHash: hash(username)
-            }).then(() => {
-                setsessionCookie({ sessionString, res });
-                resolve({
-                    message: 'session created'
-                })
             })
-                .catch(err => reject(err));
-        }
-    })
-}
+                .then(() => {
+                    setSessionCookie({ sessionString, res });
 
-const setsessionCookie = ({ sessionString, res }) => {
-    res.cookie('sessionString', sessionString, {
-        expire: Date.now() + 3600000,
-        httpOnly: true,
-        // secure: true // use with https
+                    resolve({ message: 'session created' });
+                })
+                .catch(error => reject(error));
+        }
     });
 }
+
+const setSessionCookie = ({ sessionString, res }) => {
+    res.cookie('sessionString', sessionString, {
+        expire: Date.now() + 3600000,
+        httpOnly: true
+        // secure: true // use with https
+    });
+};
 
 const authenticatedAccount = ({ sessionString }) => {
     return new Promise((resolve, reject) => {
         if (!sessionString || !Session.verify(sessionString)) {
-            const error = new Error('Invalid session')
+            const error = new Error('Invalid session');
 
             error.statusCode = 400;
 
-            return reject(error)
+            return reject(error);
         } else {
             const { username, id } = Session.parse(sessionString);
 
@@ -56,8 +57,8 @@ const authenticatedAccount = ({ sessionString }) => {
                     resolve({ account, authenticated, username });
                 })
                 .catch(error => reject(error));
-        };
+        }
     });
-}
+};
 
 module.exports = { setSession, authenticatedAccount };

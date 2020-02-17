@@ -38,6 +38,7 @@ store.dispatch(fetchAuthenticated())
                     <Switch>
                         <Route exact path='/' component={Root} />
                         <AuthRoute path='/account-dragons' component={AccountDragons} />
+                        <AuthRoute path='/public-dragons' component={PublicDragons} />
                     </Switch>
                 </Router>
             </Provider>

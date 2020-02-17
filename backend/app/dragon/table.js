@@ -3,45 +3,50 @@ const DragonTraitTable = require('../dragonTrait/table');
 
 class DragonTable {
     static storeDragon(dragon) {
-        const { birthdate, nickname, generationId, isPublic, saleValue } = dragon;
+        const { birthdate, nickname, generationId, isPublic, saleValue, sireValue } = dragon;
 
         return new Promise((resolve, reject) => {
             pool.query(
-                `INSERT INTO dragon(birthdate, nickname, "generationId", "isPublic", "saleValue") 
-                VALUES($1, $2, $3, $4, $5) RETURNING id`,
-                [birthdate, nickname, generationId, isPublic, saleValue],
-                (err, res) => {
-                    if (err) return reject(err);
+                `INSERT INTO dragon(birthdate, nickname, "generationId", "isPublic", "saleValue", "sireValue")
+           VALUES($1, $2, $3, $4, $5, $6) RETURNING id`,
+                [birthdate, nickname, generationId, isPublic, saleValue, sireValue],
+                (error, response) => {
+                    if (error) return reject(error);
 
-                    const dragonId = res.rows[0].id;
+                    const dragonId = response.rows[0].id;
 
                     Promise.all(dragon.traits.map(({ traitType, traitValue }) => {
                         return DragonTraitTable.storeDragonTrait({
                             dragonId, traitType, traitValue
                         });
-                    })).then(() => resolve({ dragonId }))
-                        .catch(err => reject(err));
+                    }))
+                        .then(() => resolve({ dragonId }))
+                        .catch(error => reject(error));
                 }
             )
         });
     }
+
     static getDragon({ dragonId }) {
         return new Promise((resolve, reject) => {
             pool.query(
-                `SELECT birthdate, nickname, "generationId", "isPublic", "saleValue" FROM dragon WHERE dragon.id = $1`,
+                `SELECT birthdate, nickname, "generationId", "isPublic", "saleValue", "sireValue", "sireValue"
+          FROM dragon
+          WHERE dragon.id = $1`,
                 [dragonId],
-                (err, res) => {
-                    if (err) return reject(err);
+                (error, response) => {
+                    if (error) return reject(error);
 
-                    if (res.rows.length === 0) return reject(new Error('no dragon'));
-                    resolve(res.rows[0]);
+                    if (response.rows.length === 0) return reject(new Error('no dragon'));
+
+                    resolve(response.rows[0]);
                 }
             )
-        })
+        });
     }
 
-    static updateDragon({ dragonId, nickname, isPublic, saleValue }) {
-        const settingsMap = { nickname, isPublic, saleValue };
+    static updateDragon({ dragonId, nickname, isPublic, saleValue, sireValue }) {
+        const settingsMap = { nickname, isPublic, saleValue, sireValue };
 
         const validQueries = Object.entries(settingsMap).filter(([settingKey, settingValue]) => {
             if (settingValue !== undefined) {
@@ -49,22 +54,18 @@ class DragonTable {
                     pool.query(
                         `UPDATE dragon SET "${settingKey}" = $1 WHERE id = $2`,
                         [settingValue, dragonId],
-                        (err, res) => {
-                            if (err) return reject(err);
+                        (error, response) => {
+                            if (error) return reject(error);
 
                             resolve();
                         }
                     )
-                })
+                });
             }
-        })
+        });
 
         return Promise.all(validQueries);
     }
 }
-
-DragonTable.updateDragon({ dragonId: 1, nickname: 'fooby' })
-    .then(() => console.log('update!!'))
-    .catch(err => console.error(err));
 
 module.exports = DragonTable;

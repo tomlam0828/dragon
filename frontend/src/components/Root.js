@@ -9,6 +9,9 @@ class Root extends Component {
             this.props.account.loggedIn ? <Home /> : <AuthForm />
         )
     }
-}
+};
 
-export default connect(({ account }) => ({ account }), null)(Root);
+export default connect(
+    ({ account }) => ({ account }),
+    null
+)(Root);

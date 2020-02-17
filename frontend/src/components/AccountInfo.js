@@ -6,6 +6,7 @@ class AccountInfo extends Component {
     componentDidMount() {
         this.props.fetchAccountInfo();
     }
+
     render() {
         return (
             <div>
@@ -18,5 +19,6 @@ class AccountInfo extends Component {
 }
 
 export default connect(
-    ({ accountInfo }) => ({ accountInfo }), { fetchAccountInfo }
+    ({ accountInfo }) => ({ accountInfo }),
+    { fetchAccountInfo }
 )(AccountInfo);
