@@ -8,7 +8,7 @@ export const fetchFromAccount = ({
     ERROR_TYPE,
     SUCCESS_TYPE
 }) => dispatch => {
-    dispatch({ type: ACCOUNT.FETCH });
+    dispatch({ type: FETCH_TYPE });
 
     return fetch(`${BACKEND.ADDRESS}/account/${endpoint}`, options)
         .then(res => res.json())
@@ -25,12 +25,10 @@ export const fetchFromAccount = ({
                 })
             }
         })
-        .catch(err => {
-            dispatch({
-                type: ERROR_TYPE,
-                message: err.message
-            });
-        })
+        .catch(err => dispatch({
+            type: ERROR_TYPE,
+            message: err.message
+        }))
 }
 
 export const signup = ({ username, password }) => fetchFromAccount({

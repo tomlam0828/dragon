@@ -23,8 +23,9 @@ const setSession = ({ username, res, sessionId }) => {
                 setsessionCookie({ sessionString, res });
                 resolve({
                     message: 'session created'
-                }).catch(err => reject(err));
+                })
             })
+                .catch(err => reject(err));
         }
     })
 }
@@ -52,7 +53,7 @@ const authenticatedAccount = ({ sessionString }) => {
                 .then(({ account }) => {
                     const authenticated = account.sessionId === id;
 
-                    resolve({ account, authenticated });
+                    resolve({ account, authenticated, username });
                 })
                 .catch(error => reject(error));
         };

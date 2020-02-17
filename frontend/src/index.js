@@ -10,6 +10,7 @@ import history from "./history";
 import Root from './components/Root';
 import AccountDragons from './components/AccountDragons';
 import { fetchAuthenticated } from './actions/account';
+import PublicDragons from './components/publicDragons';
 
 const store = createStore(
     rootReducer,
